@@ -1,0 +1,102 @@
+/* 
+   Fondo
+ */
+
+.login-section{
+
+    background:linear-gradient(180deg,#F7FCFF 0%,#EAF6FF 100%);
+    min-height:100vh;
+
+}
+
+/* 
+   Tarjeta Login
+ */
+
+.card{
+
+    border:none;
+    border-radius:20px;
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 12px 30px rgba(46,134,222,.15);
+
+}
+
+/* 
+   Logo
+ */
+
+.login-logo{
+
+    width:90px;
+
+}
+
+/* 
+   Inputs
+ */
+
+.form-control{
+
+    height:50px;
+
+}
+
+.input-group-text{
+
+    background:#FFFFFF;
+
+}
+
+/* 
+   Botón
+ */
+
+.btn-primary{
+
+    background:#2E86DE;
+    border-color:#2E86DE;
+
+}
+
+.btn-primary:hover{
+
+    background:#1F6FB2;
+    border-color:#1F6FB2;
+
+}
+
+/* 
+   Enlaces
+ */
+
+a{
+
+    color:#2E86DE;
+
+}
+
+a:hover{
+
+    color:#1F6FB2;
+
+}
+
+/* 
+   Responsive
+ */
+
+@media (max-width:768px){
+
+    .card{
+
+        margin:20px;
+
+    }
+
+}

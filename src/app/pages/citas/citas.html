@@ -1,0 +1,115 @@
+<app-navbar></app-navbar>
+
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col d-flex align-items-center justify-content-between">
+      <div>
+        <h2 class="fw-bold">Agenda de Citas</h2>
+        <p class="text-muted">Reserva y visualiza los horarios de atención para las mascotas.</p>
+      </div>
+      <a [routerLink]="esCliente ? '/' : '/dashboard'" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Programar Nueva Cita</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <form [formGroup]="citaForm" (ngSubmit)="registrarCita()">
+            <div class="mb-3">
+              <label class="form-label">Seleccionar Mascota</label>
+              <select class="form-select" formControlName="mascotaId">
+                <option value="" disabled selected>Elija un paciente</option>
+                <option *ngFor="let m of mascotas" [value]="m.id">{{ m.nombre }} (Dueño: {{ m.dueno }})</option>
+              </select>
+              <div *ngIf="mascotas.length === 0" class="form-text text-danger">
+                Primero debe registrar al menos una mascota.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Fecha</label>
+              <input type="date" class="form-control" formControlName="fecha">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Hora</label>
+              <input type="time" class="form-control" formControlName="hora">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Veterinario Especialista</label>
+              <select class="form-select" formControlName="veterinario">
+                <option value="" disabled selected>Seleccione médico</option>
+                <option *ngFor="let vet of veterinariosList" [value]="vet">{{ vet }}</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Motivo de Consulta</label>
+              <textarea class="form-control" formControlName="motivo" rows="3" placeholder="Ej: Control de vacunas anuales"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 btn-lg" [disabled]="citaForm.invalid || mascotas.length === 0">
+              <i class="bi bi-calendar-plus me-2"></i>Agendar Cita
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Citas Programadas</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="table-responsive" *ngIf="citas.length > 0; else noCitas">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Mascota</th>
+                  <th>Dueño</th>
+                  <th>Fecha/Hora</th>
+                  <th>Especialista</th>
+                  <th>Motivo</th>
+                  <th class="text-end">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cita of citas" appResaltarProxima>
+                  <td class="fw-semibold">{{ cita.mascotaNombre }}</td>
+                  <td>{{ cita.duenoNombre }}</td>
+                  <td>
+                    <div><i class="bi bi-calendar3 me-1 text-muted"></i>{{ cita.fecha | formatoFecha }}</div>
+                    <div class="small text-muted"><i class="bi bi-clock me-1 text-muted"></i>{{ cita.hora }}</div>
+                  </td>
+                  <td>{{ cita.veterinario }}</td>
+                  <td>{{ cita.motivo }}</td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarCita(cita.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noCitas>
+            <div class="text-center py-5">
+              <i class="bi bi-calendar-x display-3 text-muted"></i>
+              <p class="text-muted mt-3 mb-0">No hay citas agendadas.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

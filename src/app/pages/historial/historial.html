@@ -1,0 +1,193 @@
+<app-navbar></app-navbar>
+
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col d-flex align-items-center justify-content-between">
+      <div>
+        <h2 class="fw-bold">Historial Clínico</h2>
+        <p class="text-muted">Consulta y actualiza la ficha médica y las atenciones pasadas de cada mascota.</p>
+      </div>
+      <a [routerLink]="esCliente ? '/' : '/dashboard'" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+      </a>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+        <label class="form-label fw-bold">Seleccionar Paciente</label>
+        <select class="form-select form-select-lg" [(ngModel)]="mascotaSeleccionadaId" (change)="seleccionarMascota()">
+          <option value="" disabled selected>Elija una mascota</option>
+          <option *ngFor="let m of mascotas" [value]="m.id">{{ m.nombre }} (Dueño: {{ m.dueno }})</option>
+        </select>
+        <div *ngIf="mascotas.length === 0" class="form-text text-danger mt-2">
+          Debe registrar mascotas primero para ver historiales.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="mascotaSeleccionada; else noMascota" class="row g-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Ficha del Paciente</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3">
+              <i class="bi bi-heart-pulse display-6"></i>
+            </div>
+            <div>
+              <h4 class="fw-bold mb-0">{{ mascotaSeleccionada.nombre }}</h4>
+              <span class="badge bg-primary-subtle text-primary">{{ mascotaSeleccionada.especie }}</span>
+            </div>
+          </div>
+
+          <table class="table table-sm table-borderless">
+            <tbody>
+              <tr>
+                <td class="text-muted w-40">Raza:</td>
+                <td class="fw-semibold">{{ mascotaSeleccionada.raza }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Edad:</td>
+                <td class="fw-semibold">{{ mascotaSeleccionada.edad }} {{ mascotaSeleccionada.edad === 1 ? 'año' : 'años' }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Dueño:</td>
+                <td class="fw-semibold">{{ mascotaSeleccionada.dueno }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Contacto:</td>
+                <td class="fw-semibold">{{ mascotaSeleccionada.telefono }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Registro:</td>
+                <td class="fw-semibold">{{ mascotaSeleccionada.fechaRegistro }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4" *ngIf="!esCliente">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Agregar Entrada Médica</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <form (ngSubmit)="registrarEntrada()">
+            <div class="mb-3">
+              <label class="form-label">Diagnóstico</label>
+              <textarea class="form-control" name="diagnostico" [(ngModel)]="diagnostico" rows="3" required placeholder="Ej: Otitis bilateral leve"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Tratamiento</label>
+              <textarea class="form-control" name="tratamiento" [(ngModel)]="tratamiento" rows="3" required placeholder="Ej: Limpieza diaria y gotas óticas"></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Receta / Medicamentos</label>
+              <input type="text" class="form-control" name="receta" [(ngModel)]="receta" placeholder="Ej: Otomax 15ml cada 12h">
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 btn-lg">
+              <i class="bi bi-file-earmark-plus me-2"></i>Guardar Atención
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Historial Clínico (Atenciones Veterinarias)</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div *ngIf="historialFiltrado.length > 0; else noHistorial">
+            <div class="border-start border-2 border-warning-subtle ps-4">
+              <div class="mb-4 position-relative" *ngFor="let entrada of historialFiltrado">
+                <div class="position-absolute translate-middle-x bg-warning rounded-circle" style="width: 12px; height: 12px; left: -31px; top: 8px;"></div>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="fw-bold text-warning">{{ entrada.fecha }}</div>
+                  <button *ngIf="!esCliente" class="btn btn-sm btn-link text-danger p-0" (click)="eliminarEntrada(entrada.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                <div class="p-3 bg-light rounded-3">
+                  <p class="mb-1"><strong>Diagnóstico:</strong> {{ entrada.diagnostico }}</p>
+                  <p class="mb-1"><strong>Tratamiento:</strong> {{ entrada.tratamiento }}</p>
+                  <p class="mb-0"><strong>Receta:</strong> {{ entrada.receta }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noHistorial>
+            <div class="text-center py-5">
+              <i class="bi bi-folder-x display-3 text-muted"></i>
+              <p class="text-muted mt-3 mb-0">No hay atenciones médicas registradas para esta mascota.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Citas Programadas</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="table-responsive" *ngIf="citasFiltradas.length > 0; else noCitasFiltradas">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Fecha/Hora</th>
+                  <th>Médico</th>
+                  <th>Motivo</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of citasFiltradas">
+                  <td>
+                    <div>{{ c.fecha }}</div>
+                    <div class="small text-muted">{{ c.hora }}</div>
+                  </td>
+                  <td>{{ c.veterinario }}</td>
+                  <td>{{ c.motivo }}</td>
+                  <td>
+                    <span class="badge bg-success-subtle text-success">{{ c.estado }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noCitasFiltradas>
+            <div class="text-center py-4">
+              <i class="bi bi-calendar-check display-4 text-muted"></i>
+              <p class="text-muted mt-2 mb-0">No hay citas pendientes para esta mascota.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noMascota>
+    <div class="row">
+      <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 py-5 text-center">
+          <div class="card-body">
+            <i class="bi bi-search display-1 text-muted mb-3"></i>
+            <h4>Selecciona una mascota de la lista superior</h4>
+            <p class="text-muted mb-0">Para visualizar su historial clínico, vacunas, recetas y citas agendadas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<app-footer></app-footer>

@@ -1,0 +1,142 @@
+<app-navbar></app-navbar>
+
+<section class="container-fluid login-section">
+
+    <div class="container">
+
+        <div class="row justify-content-center align-items-center min-vh-100">
+
+            <div class="col-md-8 col-lg-5">
+
+                <div class="card shadow border-0 rounded-4">
+
+                    <div class="card-body p-5">
+
+                        <div class="text-center mb-4">
+
+                            <img
+                                src="https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=150"
+                                alt="VetCare"
+                                class="img-fluid mb-3 login-logo rounded-circle">
+
+                            <h2 class="fw-bold">
+                                Iniciar Sesión
+                            </h2>
+
+                            <p class="text-muted">
+                                Ingresa con tu cuenta para acceder al sistema de la clínica veterinaria.
+                            </p>
+
+                        </div>
+
+                        <form (ngSubmit)="iniciarSesion()">
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Correo Electrónico
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+
+                                        <i class="bi bi-envelope-fill"></i>
+
+                                    </span>
+
+                                    <input
+                                        type="email"
+                                        class="form-control"
+                                        name="correo"
+                                        [(ngModel)]="correo"
+                                        placeholder="Ingrese su correo"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <label class="form-label">
+                                    Contraseña
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+
+                                        <i class="bi bi-lock-fill"></i>
+
+                                    </span>
+
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        name="password"
+                                        [(ngModel)]="password"
+                                        placeholder="Ingrese su contraseña"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                            <div class="d-grid">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-lg">
+
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                                    Iniciar Sesión
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                        <div class="text-center mt-4">
+
+                            <p class="mb-2">
+
+                                ¿Aún no tienes una cuenta?
+
+                                <a
+                                    routerLink="/register"
+                                    class="fw-semibold text-decoration-none">
+
+                                    Regístrate aquí
+
+                                </a>
+
+                            </p>
+
+                            <a
+                                routerLink="/"
+                                class="text-decoration-none">
+
+                                <i class="bi bi-house-door-fill me-2"></i>
+
+                                Volver al Inicio
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<app-footer></app-footer>

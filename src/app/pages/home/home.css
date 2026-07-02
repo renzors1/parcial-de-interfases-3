@@ -1,0 +1,146 @@
+/* 
+   Variables
+ */
+
+:root{
+
+    --color-primario:#2E86DE;
+    --color-secundario:#5DADE2;
+    --color-fondo:#F7FCFF;
+    --color-blanco:#FFFFFF;
+    --color-texto:#2C3E50;
+    --color-hover:#1F6FB2;
+    --color-seccion:#EAF6FF;
+
+}
+
+/* 
+   Banner Principal
+ */
+
+.banner-home{
+
+    background:var(--color-fondo);
+    min-height:550px;
+
+}
+
+.banner-image{
+
+    max-height:500px;
+    object-fit:cover;
+
+}
+
+/* 
+   Sección Servicios
+ */
+
+.servicios{
+
+    background:linear-gradient(180deg,#F7FCFF 0%,#EAF6FF 100%);
+
+}
+
+/* 
+   Imágenes
+ */
+
+.service-image{
+
+    height:220px;
+    object-fit:cover;
+
+}
+
+/* 
+   Tarjetas
+ */
+
+.card{
+
+    background:var(--color-blanco);
+    border:none;
+    border-radius:16px;
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-8px);
+    box-shadow:0 10px 30px rgba(46,134,222,.15);
+
+}
+
+/* 
+   Botones
+ */
+
+.btn-primary{
+
+    background:var(--color-primario);
+    border-color:var(--color-primario);
+
+}
+
+.btn-primary:hover{
+
+    background:var(--color-hover);
+    border-color:var(--color-hover);
+
+}
+
+.btn-outline-primary{
+
+    color:var(--color-primario);
+    border-color:var(--color-primario);
+
+}
+
+.btn-outline-primary:hover{
+
+    background:var(--color-primario);
+    color:#FFFFFF;
+
+}
+
+/* 
+   Títulos
+ */
+
+h1,
+h2,
+h3,
+h4,
+h5{
+
+    color:var(--color-texto);
+
+}
+
+/* 
+Responsive*/
+
+@media (max-width:768px){
+
+    .banner-home{
+
+        text-align:center;
+
+    }
+
+    .banner-image{
+
+        margin-top:30px;
+
+    }
+
+    .btn{
+
+        width:100%;
+        margin-bottom:10px;
+
+    }
+
+}

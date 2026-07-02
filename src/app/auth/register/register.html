@@ -1,0 +1,236 @@
+<app-navbar></app-navbar>
+
+<section class="container-fluid login-section">
+
+    <div class="container">
+
+        <div class="row justify-content-center align-items-center min-vh-100">
+
+            <div class="col-lg-7 col-xl-6">
+
+                <div class="card shadow border-0 rounded-4">
+
+                    <div class="card-body p-5">
+
+                        <div class="text-center mb-4">
+
+                            <img
+                                src="https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=150"
+                                alt="VetCare"
+                                class="img-fluid login-logo rounded-circle">
+
+                            <h2 class="fw-bold mt-3">
+                                Crear Cuenta
+                            </h2>
+
+                            <p class="text-muted">
+                                Completa el formulario para crear una cuenta y gestionar las citas de tu mascota.
+                            </p>
+
+                        </div>
+
+                        <form (ngSubmit)="registrarUsuario()">
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Nombres
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        name="nombres"
+                                        [(ngModel)]="nombres"
+                                        placeholder="Ingrese sus nombres"
+                                        required>
+
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Apellidos
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        name="apellidos"
+                                        [(ngModel)]="apellidos"
+                                        placeholder="Ingrese sus apellidos"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        DNI
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        name="dni"
+                                        [(ngModel)]="dni"
+                                        placeholder="Ingrese su DNI"
+                                        required>
+
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Teléfono
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        name="telefono"
+                                        [(ngModel)]="telefono"
+                                        placeholder="Ingrese su teléfono"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Correo Electrónico
+                                </label>
+
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    name="correo"
+                                    [(ngModel)]="correo"
+                                    placeholder="Ingrese su correo"
+                                    required>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Contraseña
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        name="password"
+                                        [(ngModel)]="password"
+                                        placeholder="Ingrese una contraseña"
+                                        required>
+
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Confirmar Contraseña
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        name="confirmarPassword"
+                                        [(ngModel)]="confirmarPassword"
+                                        placeholder="Repita la contraseña"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                            <div class="form-check mb-4">
+
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="terminos"
+                                    name="terminos"
+                                    [(ngModel)]="terminos"
+                                    required>
+
+                                <label
+                                    class="form-check-label"
+                                    for="terminos">
+
+                                    Acepto los términos y condiciones.
+
+                                </label>
+
+                            </div>
+
+                            <div class="d-grid">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-lg">
+
+                                    <i class="bi bi-person-plus-fill me-2"></i>
+
+                                    Crear Cuenta
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                        <hr class="my-4">
+
+                        <div class="text-center">
+
+                            <p>
+
+                                ¿Ya tienes una cuenta?
+
+                                <a
+                                    routerLink="/login"
+                                    class="text-decoration-none fw-semibold">
+
+                                    Iniciar Sesión
+
+                                </a>
+
+                            </p>
+
+                            <a
+                                routerLink="/"
+                                class="text-decoration-none">
+
+                                <i class="bi bi-arrow-left me-2"></i>
+
+                                Volver al Inicio
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<app-footer></app-footer>

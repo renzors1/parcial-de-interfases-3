@@ -1,0 +1,113 @@
+<app-navbar></app-navbar>
+
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="fw-bold">Panel de Administración</h2>
+      <p class="text-muted">Gestiona el registro de mascotas, agenda citas y consulta historiales clínicos.</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 bg-primary text-white h-100">
+        <div class="card-body p-4 d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-uppercase text-white-50 mb-2">Mascotas Registradas</h6>
+            <h2 class="display-5 fw-bold mb-0">{{ totalMascotas }}</h2>
+          </div>
+          <i class="bi bi-heart-pulse-fill display-3 text-white-50"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
+        <div class="card-body p-4 d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-uppercase text-white-50 mb-2">Citas Agendadas</h6>
+            <h2 class="display-5 fw-bold mb-0">{{ totalCitas }}</h2>
+          </div>
+          <i class="bi bi-calendar-check-fill display-3 text-white-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+        <div class="card-body">
+          <i class="bi bi-plus-circle-fill display-4 text-primary mb-3"></i>
+          <h5>Registrar Mascota</h5>
+          <p class="text-muted small">Registra nuevos pacientes en el sistema con sus datos y dueño.</p>
+          <a routerLink="/mascotas" class="btn btn-outline-primary w-100 mt-2">Ir a Registro</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+        <div class="card-body">
+          <i class="bi bi-calendar-plus-fill display-4 text-success mb-3"></i>
+          <h5>Agendar Cita</h5>
+          <p class="text-muted small">Reserva citas médicas seleccionando horario y veterinario.</p>
+          <a routerLink="/citas" class="btn btn-outline-success w-100 mt-2">Ir a Agenda</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+        <div class="card-body">
+          <i class="bi bi-file-earmark-medical-fill display-4 text-warning mb-3"></i>
+          <h5>Historial Médico</h5>
+          <p class="text-muted small">Visualiza y actualiza los historiales clínicos por mascota.</p>
+          <a routerLink="/historial" class="btn btn-outline-warning w-100 mt-2">Ver Historial</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Citas Recientes</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="table-responsive" *ngIf="citasRecientes.length > 0; else noCitas">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Mascota</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Veterinario</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cita of citasRecientes">
+                  <td class="fw-semibold">{{ cita.mascotaNombre }}</td>
+                  <td>{{ cita.fecha }}</td>
+                  <td>{{ cita.hora }}</td>
+                  <td>{{ cita.veterinario }}</td>
+                  <td>{{ cita.motivo }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noCitas>
+            <div class="text-center py-4">
+              <i class="bi bi-calendar-x display-4 text-muted"></i>
+              <p class="text-muted mt-2 mb-0">No hay citas registradas en el sistema.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

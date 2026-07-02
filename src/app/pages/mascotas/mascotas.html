@@ -1,0 +1,127 @@
+<app-navbar></app-navbar>
+
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col d-flex align-items-center justify-content-between">
+      <div>
+        <h2 class="fw-bold">Gestión de Mascotas</h2>
+        <p class="text-muted">Registra y administra la información de los pacientes de la clínica.</p>
+      </div>
+      <a [routerLink]="esCliente ? '/' : '/dashboard'" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Registrar Mascota</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <form [formGroup]="mascotaForm" (ngSubmit)="registrarMascota()">
+            <div class="mb-3">
+              <label class="form-label">Nombre de Mascota</label>
+              <input type="text" class="form-control" formControlName="nombre" placeholder="Ej: Toby">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Especie</label>
+              <select class="form-select" formControlName="especie">
+                <option value="" disabled selected>Seleccione especie</option>
+                <option value="Canino">Canino</option>
+                <option value="Felino">Felino</option>
+                <option value="Ave">Ave</option>
+                <option value="Roedor">Roedor</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Raza</label>
+              <input type="text" class="form-control" formControlName="raza" placeholder="Ej: Poodle">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Edad (Años)</label>
+              <input type="number" class="form-control" formControlName="edad" min="0" placeholder="Ej: 3">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Nombre del Dueño</label>
+              <input type="text" class="form-control" formControlName="dueno" placeholder="Ej: Juan Pérez">
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Teléfono de Contacto</label>
+              <input type="text" class="form-control" formControlName="telefono" placeholder="Ej: 987654321">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 btn-lg" [disabled]="mascotaForm.invalid">
+              <i class="bi bi-save me-2"></i>Registrar Mascota
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Listado de Mascotas</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="table-responsive" *ngIf="mascotas.length > 0; else noMascotas">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Especie</th>
+                  <th>Raza</th>
+                  <th>Edad</th>
+                  <th>Dueño</th>
+                  <th>Contacto</th>
+                  <th class="text-end">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let mascota of mascotas" appResaltarProxima>
+                  <td class="fw-semibold">{{ mascota.nombre }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'bg-primary-subtle text-primary': mascota.especie === 'Canino',
+                      'bg-success-subtle text-success': mascota.especie === 'Felino',
+                      'bg-warning-subtle text-warning': mascota.especie === 'Ave',
+                      'bg-info-subtle text-info': mascota.especie === 'Roedor',
+                      'bg-secondary-subtle text-secondary': mascota.especie === 'Otro'
+                    }">
+                      {{ mascota.especie }}
+                    </span>
+                  </td>
+                  <td>{{ mascota.raza }}</td>
+                  <td>{{ mascota.edad }} {{ mascota.edad === 1 ? 'año' : 'años' }}</td>
+                  <td>{{ mascota.dueno }}</td>
+                  <td>{{ mascota.telefono }}</td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarMascota(mascota.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noMascotas>
+            <div class="text-center py-5">
+              <i class="bi bi-heartbreak display-3 text-muted"></i>
+              <p class="text-muted mt-3 mb-0">No hay mascotas registradas en el sistema.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
