@@ -3,8 +3,8 @@
 <div class="container py-5">
   <div class="row mb-4">
     <div class="col">
-      <h2 class="fw-bold">Panel de Administración</h2>
-      <p class="text-muted">Gestiona el registro de mascotas, agenda citas y consulta historiales clínicos.</p>
+      <h2 class="fw-bold">{{ esVeterinario ? 'Panel del Especialista' : 'Panel de Administración' }}</h2>
+      <p class="text-muted">{{ esVeterinario ? 'Visualiza tu agenda de citas, consulta historiales y registra la atención de tus pacientes.' : 'Gestiona el registro de mascotas, agenda citas y consulta historiales clínicos.' }}</p>
     </div>
   </div>
 
@@ -25,7 +25,7 @@
       <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
         <div class="card-body p-4 d-flex align-items-center justify-content-between">
           <div>
-            <h6 class="text-uppercase text-white-50 mb-2">Citas Agendadas</h6>
+            <h6 class="text-uppercase text-white-50 mb-2">{{ esVeterinario ? 'Mis Citas Programadas' : 'Citas Agendadas' }}</h6>
             <h2 class="display-5 fw-bold mb-0">{{ totalCitas }}</h2>
           </div>
           <i class="bi bi-calendar-check-fill display-3 text-white-50"></i>
@@ -73,7 +73,7 @@
     <div class="col">
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-header bg-transparent border-0 pt-4 px-4">
-          <h5 class="fw-bold mb-0">Citas Recientes</h5>
+          <h5 class="fw-bold mb-0">{{ esVeterinario ? 'Mis Citas Recientes' : 'Citas Recientes' }}</h5>
         </div>
         <div class="card-body px-4 pb-4">
           <div class="table-responsive" *ngIf="citasRecientes.length > 0; else noCitas">

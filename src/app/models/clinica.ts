@@ -8,6 +8,7 @@ export interface Mascota {
   telefono: string;
   duenoEmail?: string;
   fechaRegistro: string;
+  peso?: number;
 }
 
 export interface Cita {
@@ -29,4 +30,19 @@ export interface EntradaHistorial {
   diagnostico: string;
   tratamiento: string;
   receta: string;
+  peso?: number;
 }
+
+export interface HorarioAtencion {
+  dias: number[]; // 1 = Lunes, 2 = Martes, ..., 6 = Sabado, 0 = Domingo
+  horaInicio: string; // "HH:MM"
+  horaFin: string; // "HH:MM"
+}
+
+export interface Veterinario {
+  nombreCompleto: string; // Ej: 'Dr. Carlos Mendoza (Medicina General)'
+  nombre: string;
+  especialidad: string;
+  horario: HorarioAtencion;
+}
+

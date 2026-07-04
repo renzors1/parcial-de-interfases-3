@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Mascota, Cita, EntradaHistorial } from '../models/clinica';
+import { Mascota, Cita, EntradaHistorial, Veterinario } from '../models/clinica';
 import { MASCOTAS_INICIALES } from '../data/mascotas';
 import { CITAS_INICIALES } from '../data/citas';
 import { HISTORIALES_INICIALES } from '../data/historiales';
+import { VETERINARIOS } from '../data/veterinarios';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClinicaService {
+
+  getVeterinarios(): Veterinario[] {
+    return VETERINARIOS;
+  }
+
 
   getMascotas(): Mascota[] {
     if (typeof localStorage === 'undefined') return [];
@@ -76,5 +82,25 @@ export class ClinicaService {
     let historiales = this.getHistoriales();
     historiales = historiales.filter(h => h.id !== id);
     localStorage.setItem('historiales', JSON.stringify(historiales));
+  }
+
+  updateMascotaPeso(id: string, peso: number): void {
+    if (typeof localStorage === 'undefined') return;
+    const mascotas = this.getMascotas();
+    const idx = mascotas.findIndex(m => m.id === id);
+    if (idx !== -1) {
+      mascotas[idx].peso = peso;
+      localStorage.setItem('mascotas', JSON.stringify(mascotas));
+    }
+  }
+
+  updateCitaEstado(id: string, estado: string): void {
+    if (typeof localStorage === 'undefined') return;
+    const citas = this.getCitas();
+    const idx = citas.findIndex(c => c.id === id);
+    if (idx !== -1) {
+      citas[idx].estado = estado;
+      localStorage.setItem('citas', JSON.stringify(citas));
+    }
   }
 }

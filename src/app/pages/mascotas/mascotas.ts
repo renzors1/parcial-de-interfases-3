@@ -19,7 +19,9 @@ export class Mascotas implements OnInit {
   mascotas: Mascota[] = [];
   mascotaForm!: FormGroup;
   esCliente: boolean = false;
+  esVeterinario: boolean = false;
   correoActivo: string = '';
+  clientes: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -29,6 +31,7 @@ export class Mascotas implements OnInit {
   ngOnInit(): void {
     this.cargarDatosUsuario();
     this.cargarMascotas();
+    this.cargarClientes();
     this.inicializarFormulario();
   }
 
@@ -37,8 +40,16 @@ export class Mascotas implements OnInit {
       const activo = JSON.parse(localStorage.getItem('usuarioActivo') || '{}');
       if (activo) {
         this.esCliente = activo.rol === 'CLIENTE';
+        this.esVeterinario = activo.rol === 'VETERINARIO';
         this.correoActivo = activo.correo || '';
       }
+    }
+  }
+
+  cargarClientes(): void {
+    if (typeof localStorage !== 'undefined') {
+      const todos = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      this.clientes = todos.filter((u: any) => u.rol === 'CLIENTE');
     }
   }
 
@@ -57,9 +68,28 @@ export class Mascotas implements OnInit {
       especie: ['', Validators.required],
       raza: ['', Validators.required],
       edad: ['', [Validators.required, Validators.min(0)]],
+      clienteUsuarioId: [''],
       dueno: [{ value: duenoDefecto, disabled: this.esCliente }, Validators.required],
       telefono: [{ value: telefonoDefecto, disabled: this.esCliente }, Validators.required]
     });
+  }
+
+  onClienteChange(): void {
+    const id = this.mascotaForm.get('clienteUsuarioId')?.value;
+    if (id === 'manual' || !id) {
+      this.mascotaForm.get('dueno')?.enable();
+      this.mascotaForm.get('telefono')?.enable();
+      this.mascotaForm.get('dueno')?.setValue('');
+      this.mascotaForm.get('telefono')?.setValue('');
+    } else {
+      const cliente = this.clientes.find(c => c.correo === id);
+      if (cliente) {
+        this.mascotaForm.get('dueno')?.setValue(cliente.nombre || `${cliente.nombres} ${cliente.apellidos}`);
+        this.mascotaForm.get('telefono')?.setValue(cliente.telefono || '');
+        this.mascotaForm.get('dueno')?.disable();
+        this.mascotaForm.get('telefono')?.disable();
+      }
+    }
   }
 
   cargarMascotas(): void {
@@ -78,6 +108,16 @@ export class Mascotas implements OnInit {
     }
 
     const formValues = this.mascotaForm.getRawValue();
+    let duenoEmail = '';
+
+    if (this.esCliente) {
+      duenoEmail = this.correoActivo;
+    } else {
+      const id = this.mascotaForm.get('clienteUsuarioId')?.value;
+      if (id && id !== 'manual') {
+        duenoEmail = id;
+      }
+    }
 
     const nuevaMascota: Mascota = {
       id: Date.now().toString(),
@@ -87,20 +127,28 @@ export class Mascotas implements OnInit {
       edad: Number(formValues.edad),
       dueno: formValues.dueno,
       telefono: formValues.telefono,
-      duenoEmail: this.esCliente ? this.correoActivo : '',
+      duenoEmail: duenoEmail,
       fechaRegistro: new Date().toLocaleDateString()
     };
 
     this.clinicaService.saveMascota(nuevaMascota);
     this.cargarMascotas();
+    
     this.mascotaForm.reset({
       nombre: '',
       especie: '',
       raza: '',
       edad: '',
+      clienteUsuarioId: '',
       dueno: this.esCliente ? formValues.dueno : '',
       telefono: this.esCliente ? formValues.telefono : ''
     });
+
+    if (!this.esCliente) {
+      this.mascotaForm.get('dueno')?.enable();
+      this.mascotaForm.get('telefono')?.enable();
+    }
+
     alert('Mascota registrada correctamente.');
   }
 

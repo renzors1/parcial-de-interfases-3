@@ -33,26 +33,38 @@
             </div>
 
             <div class="mb-3">
+              <label class="form-label">Veterinario Especialista</label>
+              <select class="form-select" formControlName="veterinario" (change)="onVeterinarioChange()">
+                <option value="" disabled selected>Seleccione médico</option>
+                <option *ngFor="let vet of veterinarios" [value]="vet.nombreCompleto">{{ vet.nombreCompleto }}</option>
+              </select>
+              <div *ngIf="vetSeleccionado" class="mt-2 p-2 bg-light border border-light-subtle rounded-3 small text-muted animate__animated animate__fadeIn">
+                <i class="bi bi-clock-history me-1 text-success"></i>
+                <strong>Horario de atención:</strong> {{ obtenerTextoHorario(vetSeleccionado) }}
+              </div>
+            </div>
+
+            <div class="mb-3">
               <label class="form-label">Fecha</label>
-              <input type="date" class="form-control" formControlName="fecha">
+              <input type="date" class="form-control" formControlName="fecha" [min]="minFecha" (change)="onFechaChange()">
             </div>
 
             <div class="mb-3">
               <label class="form-label">Hora</label>
-              <input type="time" class="form-control" formControlName="hora">
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Veterinario Especialista</label>
-              <select class="form-select" formControlName="veterinario">
-                <option value="" disabled selected>Seleccione médico</option>
-                <option *ngFor="let vet of veterinariosList" [value]="vet">{{ vet }}</option>
+              <select class="form-select" formControlName="hora" [disabled]="horasDisponibles.length === 0">
+                <option value="" disabled selected>
+                  {{ citaForm.get('fecha')?.value && vetSeleccionado ? (horasDisponibles.length === 0 ? 'Sin horarios libres hoy' : 'Seleccione hora') : 'Primero elija médico y fecha' }}
+                </option>
+                <option *ngFor="let h of horasDisponibles" [value]="h">{{ h }}</option>
               </select>
             </div>
 
             <div class="mb-4">
               <label class="form-label">Motivo de Consulta</label>
-              <textarea class="form-control" formControlName="motivo" rows="3" placeholder="Ej: Control de vacunas anuales"></textarea>
+              <textarea class="form-control" formControlName="motivo" rows="3" placeholder="Ej: Control de vacunas anuales" (input)="filtrarCaracteres($event)"></textarea>
+              <div *ngIf="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.errors?.['pattern']" class="form-text text-danger mt-1">
+                El motivo solo debe contener letras, números y signos de puntuación básicos.
+              </div>
             </div>
 
             <button type="submit" class="btn btn-success w-100 btn-lg" [disabled]="citaForm.invalid || mascotas.length === 0">
@@ -78,6 +90,7 @@
                   <th>Fecha/Hora</th>
                   <th>Especialista</th>
                   <th>Motivo</th>
+                  <th>Estado</th>
                   <th class="text-end">Acción</th>
                 </tr>
               </thead>
@@ -91,10 +104,21 @@
                   </td>
                   <td>{{ cita.veterinario }}</td>
                   <td>{{ cita.motivo }}</td>
+                  <td>
+                    <span class="badge rounded-pill px-2 py-1 small fw-semibold" [ngClass]="{
+                      'bg-warning-subtle text-warning border border-warning-subtle': cita.estado !== 'Atendida',
+                      'bg-success-subtle text-success border border-success-subtle': cita.estado === 'Atendida'
+                    }">{{ cita.estado || 'Pendiente' }}</span>
+                  </td>
                   <td class="text-end">
-                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarCita(cita.id)">
-                      <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="d-flex gap-2 justify-content-end">
+                      <button *ngIf="cita.estado !== 'Atendida' && (esVeterinario || !esCliente)" class="btn btn-sm btn-success d-flex align-items-center" (click)="abrirModalAtencion(cita)">
+                        <i class="bi bi-file-earmark-medical me-1"></i>Atender
+                      </button>
+                      <button *ngIf="!esVeterinario" class="btn btn-sm btn-outline-danger" (click)="eliminarCita(cita.id)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -107,6 +131,45 @@
             </div>
           </ng-template>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Atención de Cita -->
+<div *ngIf="mostrarModalAtencion" class="modal-backdrop fade show"></div>
+<div *ngIf="mostrarModalAtencion" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.55); backdrop-filter: blur(2px);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-success text-white border-0 py-3 rounded-top-4">
+        <h5 class="modal-title fw-bold mb-0">
+          <i class="bi bi-file-earmark-medical-fill me-2"></i>Resumen de Cita: {{ citaSeleccionada?.mascotaNombre }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModalAtencion()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form (ngSubmit)="guardarResumenCita()">
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Peso de la Mascota (kg)</label>
+            <input type="number" step="0.1" class="form-control rounded-3" [(ngModel)]="atencionPeso" name="peso" placeholder="Ej: 12.5 (Opcional)">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Síntomas / Motivo de consulta</label>
+            <textarea class="form-control rounded-3 bg-light" [(ngModel)]="atencionSintomas" name="sintomas" rows="2" readonly></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Diagnóstico / Conclusión</label>
+            <textarea class="form-control rounded-3" [(ngModel)]="atencionDiagnostico" name="diagnostico" rows="3" required placeholder="Describa el diagnóstico de la mascota..." (input)="filtrarDiagnostico($event)"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Receta / Medicamentos</label>
+            <textarea class="form-control rounded-3" [(ngModel)]="atencionReceta" name="receta" rows="2" placeholder="Detalle los medicamentos recetados..." (input)="filtrarRecetaAtencion($event)"></textarea>
+          </div>
+          <div class="d-flex gap-2 justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary rounded-3 px-3" (click)="cerrarModalAtencion()">Cancelar</button>
+            <button type="submit" class="btn btn-success rounded-3 px-4">Guardar Resumen</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

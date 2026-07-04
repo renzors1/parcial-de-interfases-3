@@ -67,6 +67,10 @@
                 <td class="text-muted">Registro:</td>
                 <td class="fw-semibold">{{ mascotaSeleccionada.fechaRegistro }}</td>
               </tr>
+              <tr *ngIf="mascotaSeleccionada.peso">
+                <td class="text-muted">Peso:</td>
+                <td class="fw-semibold">{{ mascotaSeleccionada.peso }} kg</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -79,18 +83,23 @@
         <div class="card-body px-4 pb-4">
           <form (ngSubmit)="registrarEntrada()">
             <div class="mb-3">
+              <label class="form-label">Peso (kg) - Opcional</label>
+              <input type="number" step="0.1" class="form-control" name="peso" [(ngModel)]="atencionPeso" placeholder="Ej: 14.5">
+            </div>
+
+            <div class="mb-3">
               <label class="form-label">Diagnóstico</label>
-              <textarea class="form-control" name="diagnostico" [(ngModel)]="diagnostico" rows="3" required placeholder="Ej: Otitis bilateral leve"></textarea>
+              <textarea class="form-control" name="diagnostico" [(ngModel)]="diagnostico" rows="3" required placeholder="Ej: Otitis bilateral leve" (input)="filtrarDiagnostico($event)"></textarea>
             </div>
 
             <div class="mb-3">
               <label class="form-label">Tratamiento</label>
-              <textarea class="form-control" name="tratamiento" [(ngModel)]="tratamiento" rows="3" required placeholder="Ej: Limpieza diaria y gotas óticas"></textarea>
+              <textarea class="form-control" name="tratamiento" [(ngModel)]="tratamiento" rows="3" required placeholder="Ej: Limpieza diaria y gotas óticas" (input)="filtrarTratamiento($event)"></textarea>
             </div>
 
             <div class="mb-4">
               <label class="form-label">Receta / Medicamentos</label>
-              <input type="text" class="form-control" name="receta" [(ngModel)]="receta" placeholder="Ej: Otomax 15ml cada 12h">
+              <input type="text" class="form-control" name="receta" [(ngModel)]="receta" placeholder="Ej: Otomax 15ml cada 12h" (input)="filtrarReceta($event)">
             </div>
 
             <button type="submit" class="btn btn-warning w-100 btn-lg">
@@ -113,11 +122,12 @@
                 <div class="position-absolute translate-middle-x bg-warning rounded-circle" style="width: 12px; height: 12px; left: -31px; top: 8px;"></div>
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <div class="fw-bold text-warning">{{ entrada.fecha }}</div>
-                  <button *ngIf="!esCliente" class="btn btn-sm btn-link text-danger p-0" (click)="eliminarEntrada(entrada.id)">
+                  <button *ngIf="!esCliente && !esVeterinario" class="btn btn-sm btn-link text-danger p-0" (click)="eliminarEntrada(entrada.id)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
                 <div class="p-3 bg-light rounded-3">
+                  <p class="mb-1" *ngIf="entrada.peso"><strong>Peso registrado:</strong> {{ entrada.peso }} kg</p>
                   <p class="mb-1"><strong>Diagnóstico:</strong> {{ entrada.diagnostico }}</p>
                   <p class="mb-1"><strong>Tratamiento:</strong> {{ entrada.tratamiento }}</p>
                   <p class="mb-0"><strong>Receta:</strong> {{ entrada.receta }}</p>

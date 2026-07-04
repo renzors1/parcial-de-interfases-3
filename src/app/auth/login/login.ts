@@ -57,7 +57,7 @@ export class Login {
     localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
     alert('Bienvenido ' + (usuario.nombre || usuario.nombres || 'Usuario'));
 
-    if (usuario.rol === 'ADMIN') {
+    if (usuario.rol === 'ADMIN' || usuario.rol === 'VETERINARIO') {
       this.router.navigate(['/dashboard']);
     } else {
       this.router.navigate(['/']);
