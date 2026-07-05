@@ -1,0 +1,220 @@
+<app-navbar></app-navbar>
+<div class="container mt-4">
+  <div class="dashboard-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <h2 class="mb-0"><i class="bi bi-people-fill text-primary"></i> Gestión de Personal Médico</h2>
+    </div>
+    <button class="btn btn-primary" (click)="abrirModalCrear()">
+      <i class="bi bi-person-plus-fill"></i> Registrar Médico
+    </button>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre y Título</th>
+            <th>Especialidad</th>
+            <th>Contacto</th>
+            <th>Horario</th>
+            <th>Estado</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (medico of medicos; track medico.id) {
+            <tr>
+              <td>
+                <div class="fw-bold">{{ medico.nombreCompleto }}</div>
+                <div class="text-muted small">{{ medico.nombre }}</div>
+              </td>
+              <td>{{ medico.especialidad }}</td>
+              <td>
+                <div class="small" title="Correo Institucional (Acceso)"><i class="bi bi-person-badge"></i> {{ medico.correoInstitucional || 'N/A' }}</div>
+                <div class="small" title="Correo Personal"><i class="bi bi-envelope"></i> {{ medico.correoPersonal || 'N/A' }}</div>
+                <div class="small" title="Teléfono"><i class="bi bi-telephone"></i> {{ medico.telefono || 'N/A' }}</div>
+              </td>
+              <td>
+                {{ medico.horario.horaInicio }} - {{ medico.horario.horaFin }}
+              </td>
+              <td>
+                @if (medico.activo) {
+                  <span class="badge bg-success rounded-pill">Activo</span>
+                } @else {
+                  <span class="badge bg-danger rounded-pill">Inactivo</span>
+                }
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-secondary me-2" (click)="abrirModalEditar(medico)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm" 
+                        [class.btn-outline-danger]="medico.activo" 
+                        [class.btn-outline-success]="!medico.activo"
+                        (click)="toggleEstado(medico.id)"
+                        [title]="medico.activo ? 'Dar de baja' : 'Activar'">
+                  <i class="bi" [class.bi-person-x]="medico.activo" [class.bi-person-check]="!medico.activo"></i>
+                </button>
+              </td>
+            </tr>
+          }
+          @if (medicos.length === 0) {
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No hay médicos registrados.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Formulario -->
+@if (mostrarModal) {
+<div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">{{ modoEdicion ? 'Editar Médico' : 'Registrar Nuevo Médico' }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+      </div>
+      
+      <form [formGroup]="medicoForm" (ngSubmit)="guardarMedico()">
+        <div class="modal-body">
+          <small class="text-danger d-block mb-3 fw-bold"><i class="bi bi-asterisk"></i> Todos los campos de este formulario son obligatorios.</small>
+          <h6 class="text-primary mb-3">Información Profesional</h6>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre Completo</label>
+              <input type="text" class="form-control" formControlName="nombreCompleto" placeholder="Ej: Juan Pérez"
+                     [class.is-invalid]="medicoForm.get('nombreCompleto')?.invalid && medicoForm.get('nombreCompleto')?.touched">
+              @if (medicoForm.get('nombreCompleto')?.errors?.['pattern']) {
+                <div class="invalid-feedback">No se permiten símbolos extraños.</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre Corto (Auto)</label>
+              <input type="text" class="form-control" formControlName="nombre" placeholder="Ej: Dr. Juan"
+                     [class.is-invalid]="medicoForm.get('nombre')?.invalid && medicoForm.get('nombre')?.touched">
+              @if (medicoForm.get('nombre')?.errors?.['pattern']) {
+                <div class="invalid-feedback">Solo letras permitidas.</div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Especialidad</label>
+            <input type="text" class="form-control" formControlName="especialidad"
+                   [class.is-invalid]="medicoForm.get('especialidad')?.invalid && medicoForm.get('especialidad')?.touched">
+            @if (medicoForm.get('especialidad')?.errors?.['pattern']) {
+              <div class="invalid-feedback">Sin símbolos especiales.</div>
+            }
+          </div>
+
+          <hr>
+          <h6 class="text-primary mb-3">Información de Contacto y Personal</h6>
+          
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">DNI</label>
+              <input type="text" class="form-control" formControlName="dni" placeholder="8 dígitos" maxlength="8"
+                     [class.is-invalid]="medicoForm.get('dni')?.invalid && medicoForm.get('dni')?.touched">
+              @if (medicoForm.get('dni')?.errors?.['pattern']) {
+                <div class="invalid-feedback">Debe contener exactamente 8 números.</div>
+              }
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Edad</label>
+              <input type="number" class="form-control" formControlName="edad" placeholder="Ej: 35" min="20" max="99"
+                     [class.is-invalid]="medicoForm.get('edad')?.invalid && medicoForm.get('edad')?.touched">
+              @if (medicoForm.get('edad')?.errors?.['pattern']) {
+                <div class="invalid-feedback">Edad inválida (10 a 99 años).</div>
+              }
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Teléfono Celular</label>
+              <input type="text" class="form-control" formControlName="telefono" placeholder="Ej: 987654321" maxlength="9"
+                     [class.is-invalid]="medicoForm.get('telefono')?.invalid && medicoForm.get('telefono')?.touched">
+              @if (medicoForm.get('telefono')?.errors?.['pattern']) {
+                <div class="invalid-feedback">Debe ser un número válido de 9 dígitos empezando en 9.</div>
+              }
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Correo Personal (Contacto)</label>
+              <input type="email" class="form-control" formControlName="correoPersonal" placeholder="ejemplo@gmail.com"
+                     [class.is-invalid]="medicoForm.get('correoPersonal')?.invalid && medicoForm.get('correoPersonal')?.touched">
+              @if (medicoForm.get('correoPersonal')?.errors?.['pattern']) {
+                <div class="invalid-feedback">Ingrese un correo válido.</div>
+              }
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Dirección Domiciliaria</label>
+              <input type="text" class="form-control" formControlName="direccion" placeholder="Av. Los Pinos 123"
+                     [class.is-invalid]="medicoForm.get('direccion')?.invalid && medicoForm.get('direccion')?.touched">
+              @if (medicoForm.get('direccion')?.errors?.['pattern']) {
+                <div class="invalid-feedback">La dirección contiene caracteres no válidos.</div>
+              }
+            </div>
+          </div>
+
+          <hr>
+          <h6 class="text-primary mb-3">Credenciales de Acceso (Sistema)</h6>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Correo Institucional (Auto)</label>
+              <input type="email" class="form-control" formControlName="correoInstitucional" placeholder="Se genera solo..."
+                     [class.is-invalid]="medicoForm.get('correoInstitucional')?.invalid && (medicoForm.get('correoInstitucional')?.touched || medicoForm.get('correoInstitucional')?.dirty)">
+              @if (medicoForm.get('correoInstitucional')?.errors?.['pattern']) {
+                <div class="invalid-feedback">Ingrese un correo válido.</div>
+              }
+              @if (medicoForm.get('correoInstitucional')?.errors?.['correoDuplicado']) {
+                <div class="invalid-feedback fw-bold text-danger">Este correo institucional ya está en uso por otro médico.</div>
+              }
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Contraseña de Ingreso</label>
+              <input type="text" class="form-control" formControlName="password" placeholder="Min. 6 caracteres"
+                     [class.is-invalid]="medicoForm.get('password')?.invalid && medicoForm.get('password')?.touched">
+              @if (medicoForm.get('password')?.errors?.['minlength']) {
+                <div class="invalid-feedback">Debe tener al menos 6 caracteres.</div>
+              }
+            </div>
+          </div>
+
+          <hr>
+          <h6 class="text-primary mb-3">Horario Base</h6>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Hora Inicio (HH:MM)</label>
+              <input type="time" class="form-control" formControlName="horaInicio"
+                     [class.is-invalid]="medicoForm.get('horaInicio')?.invalid && medicoForm.get('horaInicio')?.touched">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Hora Fin (HH:MM)</label>
+              <input type="time" class="form-control" formControlName="horaFin"
+                     [class.is-invalid]="medicoForm.get('horaFin')?.invalid && medicoForm.get('horaFin')?.touched">
+            </div>
+          </div>
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="medicoForm.invalid">Guardar Información</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+}

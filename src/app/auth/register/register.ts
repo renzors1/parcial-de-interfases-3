@@ -5,7 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 
 import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
-import { ClinicaService } from '../../services/clinica.service';
+import { AuthService } from '../../services/auth.service';
+import { VeterinariosService } from '../../services/veterinarios.service';
 import { Veterinario } from '../../models/clinica';
 
 @Component({
@@ -38,11 +39,12 @@ export class Register implements OnInit {
 
   constructor(
     private router: Router,
-    private clinicaService: ClinicaService
+    private authService: AuthService,
+    private veterinariosService: VeterinariosService
   ) {}
 
   ngOnInit(): void {
-    this.veterinarios = this.clinicaService.getVeterinarios();
+    this.veterinarios = this.veterinariosService.getVeterinarios().filter(v => v.activo);
   }
 
   onRolChange(): void {
@@ -68,7 +70,7 @@ export class Register implements OnInit {
       return;
     }
 
-    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+    const usuarios = this.authService.getUsuarios();
 
     const existe = usuarios.find((u: any) => u.correo === this.correo);
 
@@ -96,12 +98,9 @@ export class Register implements OnInit {
       veterinarioAsociado: this.rol === 'VETERINARIO' ? this.veterinarioAsociado : undefined
     };
 
-    usuarios.push(nuevoUsuario);
+    this.authService.registrarUsuario(nuevoUsuario);
 
-    localStorage.setItem('usuarios', JSON.stringify(usuarios));
-
-    alert('Usuario registrado correctamente.');
-
+    alert('Registro exitoso. Ahora puede iniciar sesión.');
     this.router.navigate(['/login']);
 
   }

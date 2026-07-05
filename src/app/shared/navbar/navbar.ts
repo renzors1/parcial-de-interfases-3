@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -12,26 +14,35 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
-export class Navbar implements OnInit {
+export class Navbar implements OnInit, OnDestroy {
 
   usuarioActivo: any = null;
+  private authSub: Subscription | null = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {
-    if (typeof localStorage !== 'undefined') {
-      const usuario = localStorage.getItem('usuarioActivo');
-      if (usuario) {
-        this.usuarioActivo = JSON.parse(usuario);
-      }
+    this.authSub = this.authService.getUsuarioActivo$().subscribe(usuario => {
+      this.ngZone.run(() => {
+        this.usuarioActivo = usuario;
+        this.cdr.detectChanges();
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSub) {
+      this.authSub.unsubscribe();
     }
   }
 
   cerrarSesion(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('usuarioActivo');
-    }
-    this.usuarioActivo = null;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 

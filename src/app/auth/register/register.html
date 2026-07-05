@@ -155,35 +155,7 @@
 
                             </div>
 
-                            <div class="row">
-
-                                <div class="col-md-6 mb-3">
-
-                                    <label class="form-label">
-                                        Rol del Usuario
-                                    </label>
-
-                                    <select class="form-select" name="rol" [(ngModel)]="rol" (change)="onRolChange()">
-                                        <option value="CLIENTE">Cliente (Dueño de mascota)</option>
-                                        <option value="VETERINARIO">Veterinario Especialista</option>
-                                    </select>
-
-                                </div>
-
-                                <div class="col-md-6 mb-3" *ngIf="rol === 'VETERINARIO'">
-
-                                    <label class="form-label">
-                                        Especialista Asociado
-                                    </label>
-
-                                    <select class="form-select" name="veterinarioAsociado" [(ngModel)]="veterinarioAsociado" required>
-                                        <option value="" disabled selected>Seleccione médico</option>
-                                        <option *ngFor="let vet of veterinarios" [value]="vet.nombreCompleto">{{ vet.nombreCompleto }}</option>
-                                    </select>
-
-                                </div>
-
-                            </div>
+                            <!-- Rol y Veterinario Asociado removidos -->
 
                             <div class="form-check mb-4">
 

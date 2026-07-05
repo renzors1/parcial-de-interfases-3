@@ -4,7 +4,8 @@ import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angula
 import { RouterModule } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
-import { ClinicaService } from '../../services/clinica.service';
+import { MascotasService } from '../../services/mascotas.service';
+import { AuthService } from '../../services/auth.service';
 import { Mascota } from '../../models/clinica';
 import { ResaltarProximaDirective } from '../../directives/resaltar-proxima.directive';
 
@@ -25,7 +26,8 @@ export class Mascotas implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private clinicaService: ClinicaService
+    private mascotasService: MascotasService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -36,31 +38,29 @@ export class Mascotas implements OnInit {
   }
 
   cargarDatosUsuario(): void {
-    if (typeof localStorage !== 'undefined') {
-      const activo = JSON.parse(localStorage.getItem('usuarioActivo') || '{}');
-      if (activo) {
-        this.esCliente = activo.rol === 'CLIENTE';
-        this.esVeterinario = activo.rol === 'VETERINARIO';
-        this.correoActivo = activo.correo || '';
-      }
+    const activo = this.authService.getUsuarioActivo();
+    if (activo) {
+      this.esCliente = activo.rol === 'CLIENTE';
+      this.esVeterinario = activo.rol === 'VETERINARIO';
+      this.correoActivo = activo.correo || '';
     }
   }
 
   cargarClientes(): void {
-    if (typeof localStorage !== 'undefined') {
-      const todos = JSON.parse(localStorage.getItem('usuarios') || '[]');
-      this.clientes = todos.filter((u: any) => u.rol === 'CLIENTE');
-    }
+    const todos = this.authService.getUsuarios();
+    this.clientes = todos.filter((u: any) => u.rol === 'CLIENTE');
   }
 
   inicializarFormulario(): void {
     let duenoDefecto = '';
     let telefonoDefecto = '';
 
-    if (this.esCliente && typeof localStorage !== 'undefined') {
-      const activo = JSON.parse(localStorage.getItem('usuarioActivo') || '{}');
-      duenoDefecto = activo.nombres ? `${activo.nombres} ${activo.apellidos}` : (activo.nombre || '');
-      telefonoDefecto = activo.telefono || '';
+    if (this.esCliente) {
+      const activo = this.authService.getUsuarioActivo();
+      if (activo) {
+        duenoDefecto = activo.nombres ? `${activo.nombres} ${activo.apellidos}` : (activo.nombre || '');
+        telefonoDefecto = activo.telefono || '';
+      }
     }
 
     this.mascotaForm = this.fb.group({
@@ -93,7 +93,7 @@ export class Mascotas implements OnInit {
   }
 
   cargarMascotas(): void {
-    const todas = this.clinicaService.getMascotas();
+    const todas = this.mascotasService.getMascotas();
     if (this.esCliente) {
       this.mascotas = todas.filter(m => m.duenoEmail === this.correoActivo);
     } else {
@@ -103,57 +103,56 @@ export class Mascotas implements OnInit {
 
   registrarMascota(): void {
     if (this.mascotaForm.invalid) {
-      alert('Por favor complete todos los campos.');
+      alert('Por favor complete todos los campos correctamente.');
       return;
     }
 
-    const formValues = this.mascotaForm.getRawValue();
-    let duenoEmail = '';
+    const formVal = this.mascotaForm.getRawValue(); 
 
+    let duenoEmail = '';
     if (this.esCliente) {
       duenoEmail = this.correoActivo;
     } else {
-      const id = this.mascotaForm.get('clienteUsuarioId')?.value;
-      if (id && id !== 'manual') {
-        duenoEmail = id;
+      const idSeleccionado = this.mascotaForm.get('clienteUsuarioId')?.value;
+      if (idSeleccionado && idSeleccionado !== 'manual') {
+        duenoEmail = idSeleccionado;
       }
     }
 
     const nuevaMascota: Mascota = {
       id: Date.now().toString(),
-      nombre: formValues.nombre,
-      especie: formValues.especie,
-      raza: formValues.raza,
-      edad: Number(formValues.edad),
-      dueno: formValues.dueno,
-      telefono: formValues.telefono,
-      duenoEmail: duenoEmail,
+      nombre: formVal.nombre,
+      especie: formVal.especie,
+      raza: formVal.raza,
+      edad: formVal.edad,
+      dueno: formVal.dueno,
+      telefono: formVal.telefono,
+      duenoEmail: duenoEmail || undefined,
       fechaRegistro: new Date().toLocaleDateString()
     };
 
-    this.clinicaService.saveMascota(nuevaMascota);
+    this.mascotasService.saveMascota(nuevaMascota);
     this.cargarMascotas();
     
+    const duenoPre = this.esCliente ? formVal.dueno : '';
+    const telfPre = this.esCliente ? formVal.telefono : '';
+    
     this.mascotaForm.reset({
-      nombre: '',
-      especie: '',
-      raza: '',
-      edad: '',
-      clienteUsuarioId: '',
-      dueno: this.esCliente ? formValues.dueno : '',
-      telefono: this.esCliente ? formValues.telefono : ''
+      dueno: duenoPre,
+      telefono: telfPre,
+      clienteUsuarioId: ''
     });
 
     if (!this.esCliente) {
       this.mascotaForm.get('dueno')?.enable();
       this.mascotaForm.get('telefono')?.enable();
     }
-
-    alert('Mascota registrada correctamente.');
   }
 
   eliminarMascota(id: string): void {
-    this.clinicaService.deleteMascota(id);
-    this.cargarMascotas();
+    if(confirm('¿Está seguro de que desea eliminar esta mascota?')) {
+      this.mascotasService.deleteMascota(id);
+      this.cargarMascotas();
+    }
   }
 }

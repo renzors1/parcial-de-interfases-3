@@ -40,9 +40,18 @@ export interface HorarioAtencion {
 }
 
 export interface Veterinario {
+  id: string;
   nombreCompleto: string; // Ej: 'Dr. Carlos Mendoza (Medicina General)'
   nombre: string;
   especialidad: string;
   horario: HorarioAtencion;
+  activo: boolean;
+  edad?: number;
+  dni?: string;
+  telefono?: string;
+  correoPersonal?: string;
+  correoInstitucional?: string;
+  password?: string;
+  direccion?: string;
 }
 

@@ -36,7 +36,7 @@
               <label class="form-label">Veterinario Especialista</label>
               <select class="form-select" formControlName="veterinario" (change)="onVeterinarioChange()">
                 <option value="" disabled selected>Seleccione médico</option>
-                <option *ngFor="let vet of veterinarios" [value]="vet.nombreCompleto">{{ vet.nombreCompleto }}</option>
+                <option *ngFor="let vet of veterinarios" [value]="vet.nombreCompleto">{{ vet.nombreCompleto }} ({{ vet.especialidad }})</option>
               </select>
               <div *ngIf="vetSeleccionado" class="mt-2 p-2 bg-light border border-light-subtle rounded-3 small text-muted animate__animated animate__fadeIn">
                 <i class="bi bi-clock-history me-1 text-success"></i>

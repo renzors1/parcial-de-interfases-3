@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
-import { USUARIOS_INICIALES } from '../../data/usuarios';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -25,43 +25,23 @@ export class Login {
   correo: string = '';
   password: string = '';
 
-  constructor(private router: Router) {
-    if (typeof localStorage !== 'undefined') {
-      let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-      
-      USUARIOS_INICIALES.forEach(usuarioPrueba => {
-        const existe = usuarios.some((u: any) => u.correo === usuarioPrueba.correo);
-        if (!existe) {
-          usuarios.push(usuarioPrueba);
-        }
-      });
-      
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-    }
-  }
+  constructor(private authService: AuthService, private router: Router) {}
 
   iniciarSesion(): void {
-    if (typeof localStorage === 'undefined') return;
-
-    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    const usuario = usuarios.find((u: any) =>
-      u.correo === this.correo &&
-      u.password === this.password
-    );
+    const usuario = this.authService.login(this.correo, this.password);
 
     if (!usuario) {
       alert('Correo o contraseña incorrectos.');
       return;
     }
 
-    localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
-    alert('Bienvenido ' + (usuario.nombre || usuario.nombres || 'Usuario'));
-
-    if (usuario.rol === 'ADMIN' || usuario.rol === 'VETERINARIO') {
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.router.navigate(['/']);
-    }
+    // Usar setTimeout para evitar que la UI se congele o bloquee el ChangeDetection de Angular
+    setTimeout(() => {
+      if (usuario.rol === 'ADMIN' || usuario.rol === 'VETERINARIO') {
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.router.navigate(['/']);
+      }
+    }, 10);
   }
-
 }

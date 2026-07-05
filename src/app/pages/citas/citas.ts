@@ -4,7 +4,11 @@ import { ReactiveFormsModule, FormsModule, FormGroup, FormBuilder, Validators } 
 import { RouterModule } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
-import { ClinicaService } from '../../services/clinica.service';
+import { MascotasService } from '../../services/mascotas.service';
+import { CitasService } from '../../services/citas.service';
+import { VeterinariosService } from '../../services/veterinarios.service';
+import { HistorialService } from '../../services/historial.service';
+import { AuthService } from '../../services/auth.service';
 import { Mascota, Cita, Veterinario, EntradaHistorial } from '../../models/clinica';
 import { FormatoFechaPipe } from '../../pipes/formato-fecha.pipe';
 import { ResaltarProximaDirective } from '../../directives/resaltar-proxima.directive';
@@ -40,7 +44,11 @@ export class Citas implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private clinicaService: ClinicaService
+    private mascotasService: MascotasService,
+    private citasService: CitasService,
+    private veterinariosService: VeterinariosService,
+    private historialService: HistorialService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -53,14 +61,12 @@ export class Citas implements OnInit {
   }
 
   cargarDatosUsuario(): void {
-    if (typeof localStorage !== 'undefined') {
-      const activo = JSON.parse(localStorage.getItem('usuarioActivo') || '{}');
-      if (activo) {
-        this.esCliente = activo.rol === 'CLIENTE';
-        this.esVeterinario = activo.rol === 'VETERINARIO';
-        this.vetAsociadoNombre = activo.veterinarioAsociado || '';
-        this.correoActivo = activo.correo || '';
-      }
+    const activo = this.authService.getUsuarioActivo();
+    if (activo) {
+      this.esCliente = activo.rol === 'CLIENTE';
+      this.esVeterinario = activo.rol === 'VETERINARIO';
+      this.vetAsociadoNombre = activo.veterinarioAsociado || '';
+      this.correoActivo = activo.correo || '';
     }
   }
 
@@ -81,11 +87,11 @@ export class Citas implements OnInit {
   }
 
   cargarVeterinarios(): void {
-    const todosVets = this.clinicaService.getVeterinarios();
+    const todosVets = this.veterinariosService.getVeterinarios();
     if (this.esVeterinario) {
       this.veterinarios = todosVets.filter(v => v.nombreCompleto === this.vetAsociadoNombre);
     } else {
-      this.veterinarios = todosVets;
+      this.veterinarios = todosVets.filter(v => v.activo);
     }
     this.veterinariosList = this.veterinarios.map(v => v.nombreCompleto);
   }
@@ -125,10 +131,27 @@ export class Citas implements OnInit {
       horas.push(horaStr);
     }
 
-    const citasExistentes = this.clinicaService.getCitas();
+    const citasExistentes = this.citasService.getCitas();
     const vetNombre = this.vetSeleccionado.nombreCompleto;
     
+    // Obtener hora y fecha actual para validación
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const hoyStr = `${anio}-${mes}-${dia}`;
+    const horaActual = hoy.getHours();
+    
     this.horasDisponibles = horas.filter(h => {
+      // 1. Validar que la hora no haya pasado si la cita es para hoy
+      if (fecha === hoyStr) {
+        const horaInt = parseInt(h.split(':')[0], 10);
+        if (horaInt <= horaActual) {
+          return false; // Bloquear horas pasadas o la hora actual
+        }
+      }
+
+      // 2. Validar que no esté ocupada
       const ocupada = citasExistentes.some(c => 
         c.veterinario === vetNombre &&
         c.fecha === fecha &&
@@ -147,7 +170,7 @@ export class Citas implements OnInit {
   }
 
   cargarMascotas(): void {
-    const todas = this.clinicaService.getMascotas();
+    const todas = this.mascotasService.getMascotas();
     if (this.esCliente) {
       this.mascotas = todas.filter(m => m.duenoEmail === this.correoActivo);
     } else {
@@ -156,7 +179,7 @@ export class Citas implements OnInit {
   }
 
   cargarCitas(): void {
-    const todas = this.clinicaService.getCitas();
+    const todas = this.citasService.getCitas();
     if (this.esCliente) {
       const misMascotasIds = this.mascotas.map(m => m.id);
       this.citas = todas.filter(c => misMascotasIds.includes(c.mascotaId));
@@ -215,7 +238,7 @@ export class Citas implements OnInit {
     }
 
     // 3. Validar colisiones (mismo doctor, fecha y hora)
-    const citasExistentes = this.clinicaService.getCitas();
+    const citasExistentes = this.citasService.getCitas();
     const hayColision = citasExistentes.some(c => 
       c.veterinario === formVal.veterinario &&
       c.fecha === formVal.fecha &&
@@ -245,7 +268,7 @@ export class Citas implements OnInit {
       estado: 'Pendiente'
     };
 
-    this.clinicaService.saveCita(nuevaCita);
+    this.citasService.saveCita(nuevaCita);
     this.cargarCitas();
     
     const vetPorDefecto = this.esVeterinario ? this.vetAsociadoNombre : '';
@@ -263,7 +286,7 @@ export class Citas implements OnInit {
   }
 
   eliminarCita(id: string): void {
-    this.clinicaService.deleteCita(id);
+    this.citasService.deleteCita(id);
     this.cargarCitas();
   }
 
@@ -303,15 +326,15 @@ export class Citas implements OnInit {
       receta: this.atencionReceta || 'Ninguna',
       peso: this.atencionPeso || undefined
     };
-    this.clinicaService.saveHistorial(nuevaEntrada);
+    this.historialService.saveHistorial(nuevaEntrada);
 
     // 2. Actualizar peso de la mascota si se ingresó
     if (this.atencionPeso !== null && this.atencionPeso > 0) {
-      this.clinicaService.updateMascotaPeso(mascotaId, this.atencionPeso);
+      this.mascotasService.updateMascotaPeso(mascotaId, this.atencionPeso);
     }
 
     // 3. Cambiar estado de la cita a 'Atendida'
-    this.clinicaService.updateCitaEstado(this.citaSeleccionada.id, 'Atendida');
+    this.citasService.updateCitaEstado(this.citaSeleccionada.id, 'Atendida');
 
     this.cerrarModalAtencion();
     this.cargarCitas();

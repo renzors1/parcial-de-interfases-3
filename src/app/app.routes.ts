@@ -7,6 +7,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Mascotas } from './pages/mascotas/mascotas';
 import { Citas } from './pages/citas/citas';
 import { Historial } from './pages/historial/historial';
+import { GestionMedicos } from './pages/gestion-medicos/gestion-medicos';
 
 export const routes: Routes = [
 
@@ -43,6 +44,11 @@ export const routes: Routes = [
   {
     path: 'historial',
     component: Historial
+  },
+
+  {
+    path: 'gestion-medicos',
+    component: GestionMedicos
   },
 
   {

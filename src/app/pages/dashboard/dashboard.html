@@ -4,110 +4,211 @@
   <div class="row mb-4">
     <div class="col">
       <h2 class="fw-bold">{{ esVeterinario ? 'Panel del Especialista' : 'Panel de Administración' }}</h2>
-      <p class="text-muted">{{ esVeterinario ? 'Visualiza tu agenda de citas, consulta historiales y registra la atención de tus pacientes.' : 'Gestiona el registro de mascotas, agenda citas y consulta historiales clínicos.' }}</p>
+      <p class="text-muted">{{ esVeterinario ? 'Visualiza tu agenda de citas, consulta historiales y registra la atención de tus pacientes.' : 'Gestiona y supervisa al personal médico de la clínica.' }}</p>
     </div>
   </div>
 
-  <div class="row g-4 mb-5">
-    <div class="col-md-6 col-lg-6">
-      <div class="card border-0 shadow-sm rounded-4 bg-primary text-white h-100">
-        <div class="card-body p-4 d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="text-uppercase text-white-50 mb-2">Mascotas Registradas</h6>
-            <h2 class="display-5 fw-bold mb-0">{{ totalMascotas }}</h2>
-          </div>
-          <i class="bi bi-heart-pulse-fill display-3 text-white-50"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-6">
-      <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
-        <div class="card-body p-4 d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="text-uppercase text-white-50 mb-2">{{ esVeterinario ? 'Mis Citas Programadas' : 'Citas Agendadas' }}</h6>
-            <h2 class="display-5 fw-bold mb-0">{{ totalCitas }}</h2>
-          </div>
-          <i class="bi bi-calendar-check-fill display-3 text-white-50"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row g-4 mb-5">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-        <div class="card-body">
-          <i class="bi bi-plus-circle-fill display-4 text-primary mb-3"></i>
-          <h5>Registrar Mascota</h5>
-          <p class="text-muted small">Registra nuevos pacientes en el sistema con sus datos y dueño.</p>
-          <a routerLink="/mascotas" class="btn btn-outline-primary w-100 mt-2">Ir a Registro</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-        <div class="card-body">
-          <i class="bi bi-calendar-plus-fill display-4 text-success mb-3"></i>
-          <h5>Agendar Cita</h5>
-          <p class="text-muted small">Reserva citas médicas seleccionando horario y veterinario.</p>
-          <a routerLink="/citas" class="btn btn-outline-success w-100 mt-2">Ir a Agenda</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-        <div class="card-body">
-          <i class="bi bi-file-earmark-medical-fill display-4 text-warning mb-3"></i>
-          <h5>Historial Médico</h5>
-          <p class="text-muted small">Visualiza y actualiza los historiales clínicos por mascota.</p>
-          <a routerLink="/historial" class="btn btn-outline-warning w-100 mt-2">Ver Historial</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
-      <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-header bg-transparent border-0 pt-4 px-4">
-          <h5 class="fw-bold mb-0">{{ esVeterinario ? 'Mis Citas Recientes' : 'Citas Recientes' }}</h5>
-        </div>
-        <div class="card-body px-4 pb-4">
-          <div class="table-responsive" *ngIf="citasRecientes.length > 0; else noCitas">
-            <table class="table align-middle">
-              <thead>
-                <tr>
-                  <th>Mascota</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Veterinario</th>
-                  <th>Motivo</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let cita of citasRecientes">
-                  <td class="fw-semibold">{{ cita.mascotaNombre }}</td>
-                  <td>{{ cita.fecha }}</td>
-                  <td>{{ cita.hora }}</td>
-                  <td>{{ cita.veterinario }}</td>
-                  <td>{{ cita.motivo }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <ng-template #noCitas>
-            <div class="text-center py-4">
-              <i class="bi bi-calendar-x display-4 text-muted"></i>
-              <p class="text-muted mt-2 mb-0">No hay citas registradas en el sistema.</p>
+  <ng-container *ngIf="esVeterinario">
+    <!-- VISTA VETERINARIO -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-6 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white h-100">
+          <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="text-uppercase text-white-50 mb-2">Mis Citas Pendientes</h6>
+              <h2 class="display-5 fw-bold mb-0">{{ totalCitas }}</h2>
             </div>
-          </ng-template>
+            <i class="bi bi-calendar-check-fill display-3 text-white-50"></i>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
+          <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="text-uppercase text-white-50 mb-2">Mascotas Registradas Totales</h6>
+              <h2 class="display-5 fw-bold mb-0">{{ totalMascotas }}</h2>
+            </div>
+            <i class="bi bi-heart-pulse-fill display-3 text-white-50"></i>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+          <div class="card-body">
+            <i class="bi bi-plus-circle-fill display-4 text-primary mb-3"></i>
+            <h5>Pacientes</h5>
+            <p class="text-muted small">Registra nuevos pacientes en el sistema con sus datos y dueño.</p>
+            <a routerLink="/mascotas" class="btn btn-outline-primary w-100 mt-2">Ir a Mascotas</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+          <div class="card-body">
+            <i class="bi bi-calendar-plus-fill display-4 text-success mb-3"></i>
+            <h5>Agendar Cita</h5>
+            <p class="text-muted small">Reserva citas médicas seleccionando horario y veterinario.</p>
+            <a routerLink="/citas" class="btn btn-outline-success w-100 mt-2">Ir a Agenda</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+          <div class="card-body">
+            <i class="bi bi-file-earmark-medical-fill display-4 text-warning mb-3"></i>
+            <h5>Historial Médico</h5>
+            <p class="text-muted small">Visualiza y actualiza los historiales clínicos por mascota.</p>
+            <a routerLink="/historial" class="btn btn-outline-warning w-100 mt-2">Ver Historial</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-header bg-transparent border-0 pt-4 px-4">
+            <h5 class="fw-bold mb-0">Mis Citas Recientes</h5>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive" *ngIf="citasRecientes.length > 0; else noCitas">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Mascota</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Motivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cita of citasRecientes">
+                    <td class="fw-semibold">{{ cita.mascotaNombre }}</td>
+                    <td>{{ cita.fecha }}</td>
+                    <td>{{ cita.hora }}</td>
+                    <td>{{ cita.motivo }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <ng-template #noCitas>
+              <div class="text-center py-4">
+                <i class="bi bi-calendar-x display-4 text-muted"></i>
+                <p class="text-muted mt-2 mb-0">No hay citas registradas.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!esVeterinario">
+    <!-- VISTA ADMIN -->
+    <div class="row mb-4">
+      <div class="col">
+        <h5 class="fw-bold text-secondary mb-3">Resumen del Negocio</h5>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <!-- Tarjeta: Pacientes Totales -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white h-100">
+          <div class="card-body p-3 d-flex flex-column align-items-center text-center">
+            <i class="bi bi-heart-pulse-fill display-5 mb-2 opacity-75"></i>
+            <h3 class="fw-bold mb-0">{{ adminTotalMascotas }}</h3>
+            <span class="text-uppercase small fw-semibold opacity-75">Pacientes Totales</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tarjeta: Total Citas Históricas -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-info text-white h-100">
+          <div class="card-body p-3 d-flex flex-column align-items-center text-center">
+            <i class="bi bi-calendar-check-fill display-5 mb-2 opacity-75"></i>
+            <h3 class="fw-bold mb-0">{{ adminTotalCitas }}</h3>
+            <span class="text-uppercase small fw-semibold opacity-75">Citas Globales</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta: Citas Pendientes -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-warning text-dark h-100">
+          <div class="card-body p-3 d-flex flex-column align-items-center text-center">
+            <i class="bi bi-clock-history display-5 mb-2 opacity-75"></i>
+            <h3 class="fw-bold mb-0">{{ adminCitasPendientes }}</h3>
+            <span class="text-uppercase small fw-semibold opacity-75">Por Atender</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta: Citas Atendidas -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
+          <div class="card-body p-3 d-flex flex-column align-items-center text-center">
+            <i class="bi bi-check-circle-fill display-5 mb-2 opacity-75"></i>
+            <h3 class="fw-bold mb-0">{{ adminCitasAtendidas }}</h3>
+            <span class="text-uppercase small fw-semibold opacity-75">Completadas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-header bg-transparent border-0 pt-4 px-4">
+            <h5 class="fw-bold mb-0">Directorio Médico Reciente</h5>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive" *ngIf="veterinariosRecientes.length > 0; else noVet">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Especialidad</th>
+                    <th class="text-center">Citas Pendientes</th>
+                    <th class="text-center">Citas Atendidas</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let vet of veterinariosRecientes">
+                    <td class="fw-semibold">{{ vet.nombreCompleto }}</td>
+                    <td>{{ vet.especialidad }}</td>
+                    <td class="text-center">
+                      <span class="badge bg-warning text-dark rounded-pill">{{ vet.pendientes }}</span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge bg-success rounded-pill">{{ vet.atendidas }}</span>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill px-2 py-1 small fw-semibold" [ngClass]="{'bg-success-subtle text-success': vet.activo, 'bg-danger-subtle text-danger': !vet.activo}">
+                        {{ vet.activo ? 'Activo' : 'Inactivo' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <ng-template #noVet>
+              <div class="text-center py-4">
+                <i class="bi bi-person-x display-4 text-muted"></i>
+                <p class="text-muted mt-2 mb-0">No hay personal médico registrado.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 </div>
 
 <app-footer></app-footer>

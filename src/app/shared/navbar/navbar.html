@@ -24,195 +24,63 @@
             class="collapse navbar-collapse"
             id="menuNavbar">
 
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
 
                 <!-- Sin iniciar sesión -->
 
                 <ng-container *ngIf="!usuarioActivo">
 
                     <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/">
-                            Inicio
-                        </a>
-
+                        <a class="nav-link" routerLink="/">Inicio</a>
                     </li>
 
                     <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/login">
-                            Login
-                        </a>
-
+                        <a class="nav-link" routerLink="/login">Login</a>
                     </li>
 
                 </ng-container>
 
-                <!-- Cliente -->
+                <!-- Menú Usuario Activo -->
+                
+                <ng-container *ngIf="usuarioActivo">
 
-                <ng-container *ngIf="usuarioActivo?.rol === 'CLIENTE'">
+                    <!-- Cliente -->
+                    <ng-container *ngIf="usuarioActivo.rol === 'CLIENTE'">
+                        <li class="nav-item"><a class="nav-link" routerLink="/">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/mascotas">Mascotas</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/citas">Citas</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/historial">Historial</a></li>
+                    </ng-container>
 
-                    <li class="nav-item">
+                    <!-- Administrador -->
+                    <ng-container *ngIf="usuarioActivo.rol === 'ADMIN'">
+                        <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/gestion-medicos">Personal Médico</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/mascotas">Mascotas</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/citas">Citas</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/historial">Historial</a></li>
+                    </ng-container>
 
-                        <a
-                            class="nav-link"
-                            routerLink="/">
-                            Inicio
-                        </a>
+                    <!-- Veterinario -->
+                    <ng-container *ngIf="usuarioActivo.rol === 'VETERINARIO'">
+                        <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/mascotas">Mascotas</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/citas">Mis Citas</a></li>
+                        <li class="nav-item"><a class="nav-link" routerLink="/historial">Historial</a></li>
+                    </ng-container>
 
+                    <!-- Etiqueta del Usuario -->
+                    <li class="nav-item mx-2">
+                        <span class="navbar-text fw-bold text-primary">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ usuarioActivo.nombre || usuarioActivo.nombres || usuarioActivo.correo }}
+                        </span>
                     </li>
 
                     <li class="nav-item">
-                        <a
-                            class="nav-link"
-                            routerLink="/mascotas">
-                            Mascotas
+                        <a class="nav-link text-danger" style="cursor: pointer;" (click)="cerrarSesion()">
+                            <i class="bi bi-box-arrow-right me-1"></i> Salir
                         </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link"
-                            routerLink="/citas">
-                            Citas
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/historial">
-                            Historial
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            (click)="cerrarSesion()">
-                            Cerrar Sesión
-                        </a>
-
-                    </li>
-
-                </ng-container>
-
-                <!-- Administrador -->
-
-                <ng-container *ngIf="usuarioActivo?.rol === 'ADMIN'">
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/dashboard">
-                            Dashboard
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/mascotas">
-                            Mascotas
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/citas">
-                            Citas
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/historial">
-                            Historial
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            (click)="cerrarSesion()">
-                            Cerrar Sesión
-                        </a>
-
-                    </li>
-
-                </ng-container>
-
-                <!-- Veterinario -->
-
-                <ng-container *ngIf="usuarioActivo?.rol === 'VETERINARIO'">
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/dashboard">
-                            Dashboard
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/mascotas">
-                            Mascotas
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/citas">
-                            Mis Citas
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            routerLink="/historial">
-                            Historial
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            style="cursor: pointer;"
-                            (click)="cerrarSesion()">
-                            Cerrar Sesión
-                        </a>
-
                     </li>
 
                 </ng-container>

@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
-import { ClinicaService } from '../../services/clinica.service';
+import { HistorialService } from '../../services/historial.service';
+import { CitasService } from '../../services/citas.service';
+import { MascotasService } from '../../services/mascotas.service';
+import { AuthService } from '../../services/auth.service';
 import { Mascota, Cita, EntradaHistorial } from '../../models/clinica';
 
 @Component({
@@ -32,7 +35,12 @@ export class Historial implements OnInit {
   esVeterinario: boolean = false;
   correoActivo: string = '';
 
-  constructor(private clinicaService: ClinicaService) {}
+  constructor(
+    private historialService: HistorialService,
+    private citasService: CitasService,
+    private mascotasService: MascotasService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
@@ -40,25 +48,23 @@ export class Historial implements OnInit {
   }
 
   cargarDatosUsuario(): void {
-    if (typeof localStorage !== 'undefined') {
-      const activo = JSON.parse(localStorage.getItem('usuarioActivo') || '{}');
-      if (activo) {
-        this.esCliente = activo.rol === 'CLIENTE';
-        this.esVeterinario = activo.rol === 'VETERINARIO';
-        this.correoActivo = activo.correo || '';
-      }
+    const activo = this.authService.getUsuarioActivo();
+    if (activo) {
+      this.esCliente = activo.rol === 'CLIENTE';
+      this.esVeterinario = activo.rol === 'VETERINARIO';
+      this.correoActivo = activo.correo || '';
     }
   }
 
   cargarDatos(): void {
-    const todasMascotas = this.clinicaService.getMascotas();
+    const todasMascotas = this.mascotasService.getMascotas();
     if (this.esCliente) {
       this.mascotas = todasMascotas.filter(m => m.duenoEmail === this.correoActivo);
     } else {
       this.mascotas = todasMascotas;
     }
-    this.citas = this.clinicaService.getCitas();
-    this.historiales = this.clinicaService.getHistoriales();
+    this.citas = this.citasService.getCitas();
+    this.historiales = this.historialService.getHistoriales();
   }
 
   seleccionarMascota(): void {
@@ -83,7 +89,7 @@ export class Historial implements OnInit {
     }
 
     if (this.atencionPeso !== null && this.atencionPeso > 0) {
-      this.clinicaService.updateMascotaPeso(this.mascotaSeleccionadaId, this.atencionPeso);
+      this.mascotasService.updateMascotaPeso(this.mascotaSeleccionadaId, this.atencionPeso);
     }
 
     const nuevaEntrada: EntradaHistorial = {
@@ -96,25 +102,24 @@ export class Historial implements OnInit {
       peso: this.atencionPeso || undefined
     };
 
-    this.clinicaService.saveHistorial(nuevaEntrada);
+    this.historialService.saveHistorial(nuevaEntrada);
     this.cargarDatos();
+    this.filtrarHistorial();
+
     this.diagnostico = '';
     this.tratamiento = '';
     this.receta = '';
     this.atencionPeso = null;
 
-    this.mascotaSeleccionada = this.mascotas.find(m => m.id === this.mascotaSeleccionadaId) || null;
-
-    this.filtrarHistorial();
-    alert('Entrada agregada al historial correctamente.');
+    alert('Atención médica registrada correctamente en el historial.');
   }
 
   eliminarEntrada(id: string): void {
-    this.clinicaService.deleteHistorial(id);
-    this.cargarDatos();
-    
-    this.mascotaSeleccionada = this.mascotas.find(m => m.id === this.mascotaSeleccionadaId) || null;
-    this.filtrarHistorial();
+    if (confirm('¿Está seguro de eliminar este registro del historial?')) {
+      this.historialService.deleteHistorial(id);
+      this.cargarDatos();
+      this.filtrarHistorial();
+    }
   }
 
   filtrarDiagnostico(event: Event): void {

@@ -6,10 +6,10 @@ export const CITAS_INICIALES: Cita[] = [
     mascotaId: 'm1',
     mascotaNombre: 'Toby',
     duenoNombre: 'Juan Perez',
-    fecha: new Date().toISOString().split('T')[0],
+    fecha: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Mañana
     hora: '10:00',
-    veterinario: 'Dr. Carlos Mendoza (Medicina General)',
-    motivo: 'Vacunación y control anual',
+    veterinario: 'Carlos Mendoza Rodríguez',
+    motivo: 'Control general y desparasitación',
     estado: 'Pendiente'
   },
   {
@@ -17,10 +17,32 @@ export const CITAS_INICIALES: Cita[] = [
     mascotaId: 'm3',
     mascotaNombre: 'Rocky',
     duenoNombre: 'Maria Gomez',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: '15:30',
-    veterinario: 'Dra. Ana Silva (Cirugía y Especialidades)',
-    motivo: 'Chequeo de rutina post-operatorio',
+    fecha: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0], // Pasado mañana
+    hora: '11:00',
+    veterinario: 'Ana Silva Vargas',
+    motivo: 'Evaluación quirúrgica',
+    estado: 'Pendiente'
+  },
+  {
+    id: 'c3',
+    mascotaId: 'm2',
+    mascotaNombre: 'Luna',
+    duenoNombre: 'Juan Perez',
+    fecha: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Mañana
+    hora: '14:00',
+    veterinario: 'Luis Ramos Gutiérrez',
+    motivo: 'Chequeo dermatológico (Alergia)',
+    estado: 'Pendiente'
+  },
+  {
+    id: 'c4',
+    mascotaId: 'm1',
+    mascotaNombre: 'Toby',
+    duenoNombre: 'Juan Perez',
+    fecha: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0], // En 3 días
+    hora: '09:00',
+    veterinario: 'Sofía Pérez Jiménez',
+    motivo: 'Asesoría nutricional',
     estado: 'Pendiente'
   }
 ];
