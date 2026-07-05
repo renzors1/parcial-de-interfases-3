@@ -44,6 +44,7 @@
                                         class="form-control"
                                         name="nombres"
                                         [(ngModel)]="nombres"
+                                        (input)="filtrarNombres($event, 'nombres')"
                                         placeholder="Ingrese sus nombres"
                                         required>
 
@@ -60,6 +61,7 @@
                                         class="form-control"
                                         name="apellidos"
                                         [(ngModel)]="apellidos"
+                                        (input)="filtrarNombres($event, 'apellidos')"
                                         placeholder="Ingrese sus apellidos"
                                         required>
 
@@ -80,6 +82,8 @@
                                         class="form-control"
                                         name="dni"
                                         [(ngModel)]="dni"
+                                        (input)="filtrarDNI($event)"
+                                        maxlength="8"
                                         placeholder="Ingrese su DNI"
                                         required>
 
@@ -96,6 +100,8 @@
                                         class="form-control"
                                         name="telefono"
                                         [(ngModel)]="telefono"
+                                        (input)="filtrarTelefono($event)"
+                                        maxlength="9"
                                         placeholder="Ingrese su teléfono"
                                         required>
 

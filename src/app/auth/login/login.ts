@@ -28,6 +28,17 @@ export class Login {
   constructor(private authService: AuthService, private router: Router) {}
 
   iniciarSesion(): void {
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (!emailRegex.test(this.correo)) {
+      alert('Por favor, ingrese un correo válido.');
+      return;
+    }
+
+    if (this.password.length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
     const usuario = this.authService.login(this.correo, this.password);
 
     if (!usuario) {

@@ -55,6 +55,35 @@ export class Register implements OnInit {
 
   registrarUsuario(): void {
 
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    if (!nameRegex.test(this.nombres) || !nameRegex.test(this.apellidos)) {
+      alert('Los nombres y apellidos solo pueden contener letras y espacios.');
+      return;
+    }
+
+    const dniRegex = /^\d{8}$/;
+    if (this.dni && !dniRegex.test(this.dni)) {
+      alert('El DNI debe contener exactamente 8 dígitos numéricos.');
+      return;
+    }
+
+    const telRegex = /^9\d{8}$/;
+    if (this.telefono && !telRegex.test(this.telefono)) {
+      alert('El teléfono debe tener 9 dígitos y empezar con 9.');
+      return;
+    }
+
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (!emailRegex.test(this.correo)) {
+      alert('Por favor, ingrese un correo válido.');
+      return;
+    }
+
+    if (this.password.length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
     if (this.password !== this.confirmarPassword) {
       alert('Las contraseñas no coinciden.');
       return;
@@ -103,6 +132,27 @@ export class Register implements OnInit {
     alert('Registro exitoso. Ahora puede iniciar sesión.');
     this.router.navigate(['/login']);
 
+  }
+
+  filtrarNombres(event: Event, campo: 'nombres' | 'apellidos'): void {
+    const input = event.target as HTMLInputElement;
+    const regex = /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g;
+    input.value = input.value.replace(regex, '');
+    this[campo] = input.value;
+  }
+
+  filtrarDNI(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const regex = /[^0-9]/g;
+    input.value = input.value.replace(regex, '').substring(0, 8);
+    this.dni = input.value;
+  }
+
+  filtrarTelefono(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const regex = /[^0-9]/g;
+    input.value = input.value.replace(regex, '').substring(0, 9);
+    this.telefono = input.value;
   }
 
 }
